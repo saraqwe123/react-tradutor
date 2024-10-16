@@ -1,6 +1,20 @@
+import { useState } from "react";
 
 
 function App() {
+
+  const [lingua, newLingua] = useState("")
+  function AlteraLingua(e) {
+    for (let i = 0; i < languages.length; i++) {
+      if (languages.code[i] == option.value) {
+        lingua = languages.name[i]
+      }
+    }
+  }
+
+
+
+
   const languages = [
     { code: "en-us", name: "Inglês" },
     { code: "es", name: "Espanhol" },
@@ -10,7 +24,7 @@ function App() {
     { code: "pt-br", name: "Português" },
   ];
 
-  let isLoading = false
+  let isLoading = false 
   let error = ""
 
   return (
@@ -24,12 +38,18 @@ function App() {
       <main className="flex-grow flex items-start justify-center px-4 py-8">
         <div className="w-full max-w-5xl bg-white rounded-lg shadow-md overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <select
+            <select onClick={AlteraLingua}
               className="text-sm text-textColor bg-transparent border-none focus:outline-none cursor-pointer"
-              value="en-us"
+              value = {lingua}
             >
               <option value="pt-br">Português</option>
               <option value="en-us">Inglês</option>
+              <option value="it">Italiano</option>
+              <option value="fr">Fracês</option>
+              <option value="de">Alemão</option>
+              <option value="it">Italiano</option>
+              <option value="es">Espanhol</option>
+
             </select>
 
             <button className="p-2 rounded-full hover:bg-gray-100 outline-none">
@@ -55,6 +75,11 @@ function App() {
             >
               <option value="pt-br">Português</option>
               <option value="en-us">Inglês</option>
+              <option value="it">Italiano</option>
+              <option value="fr">Fracês</option>
+              <option value="de">Alemão</option>
+              <option value="it">Italiano</option>
+              <option value="es">Espanhol</option>
             </select>
           </div>
 
