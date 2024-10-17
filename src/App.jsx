@@ -1,19 +1,33 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 
 function App() {
+  const [linguaAtual, novaLingua] = useState("pt-br");
+  const [linguaTraduzida, novaLinguaTraduzida] = useState("en-us");
+  const [textoVazio, novoTexto] = useState("");
+  const [traduzir, traduzido] = useState("");
+  const [isLoading, isLoading1] = useState("");
 
-  const [lingua, newLingua] = useState("")
-  function AlteraLingua(e) {
-    for (let i = 0; i < languages.length; i++) {
-      if (languages.code[i] == option.value) {
-        lingua = languages.name[i]
-      }
+  let error = "";
+
+  useEffect(() => {
+    if (textoVazio) {
+      traducao();
     }
-  }
+  }, [textoVazio]);
 
+  const traducao = async () => {
+    isLoading1(true);
+    const response = await fetch(
+      `https://api.mymemory.translated.net/get?q=${textoVazio}!&langpair=${linguaAtual}|${linguaTraduzida}`
+    );
 
-
+    if (!response.ok) {
+      alert("Erro ao traduzir");
+    }
+    const data = await response.json();
+    traduzido(data.responseData.translatedText);
+    isLoading1(false);
+  };
 
   const languages = [
     { code: "en-us", name: "Inglês" },
@@ -23,9 +37,6 @@ function App() {
     { code: "it", name: "Italiano" },
     { code: "pt-br", name: "Português" },
   ];
-
-  let isLoading = false 
-  let error = ""
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -38,18 +49,16 @@ function App() {
       <main className="flex-grow flex items-start justify-center px-4 py-8">
         <div className="w-full max-w-5xl bg-white rounded-lg shadow-md overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <select onClick={AlteraLingua}
+            <select
               className="text-sm text-textColor bg-transparent border-none focus:outline-none cursor-pointer"
-              value = {lingua}
+              value={linguaAtual}
+              onChange={(e) => novaLingua(e.target.value)}
             >
-              <option value="pt-br">Português</option>
-              <option value="en-us">Inglês</option>
-              <option value="it">Italiano</option>
-              <option value="fr">Fracês</option>
-              <option value="de">Alemão</option>
-              <option value="it">Italiano</option>
-              <option value="es">Espanhol</option>
-
+              {languages.map((lingua) => (
+                <option key={lingua.code} value={lingua.code}>
+                  {lingua.name}
+                </option>
+              ))}
             </select>
 
             <button className="p-2 rounded-full hover:bg-gray-100 outline-none">
@@ -71,15 +80,14 @@ function App() {
 
             <select
               className="text-sm text-textColor bg-transparent border-none focus:outline-none cursor-pointer"
-              value="pt-br"
+              value={linguaTraduzida}
+              onChange={(e) => novaLinguaTraduzida(e.target.value)}
             >
-              <option value="pt-br">Português</option>
-              <option value="en-us">Inglês</option>
-              <option value="it">Italiano</option>
-              <option value="fr">Fracês</option>
-              <option value="de">Alemão</option>
-              <option value="it">Italiano</option>
-              <option value="es">Espanhol</option>
+              {languages.map((lingua) => (
+                <option key={lingua.code} value={lingua.code}>
+                  {lingua.name}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -87,7 +95,7 @@ function App() {
             <div className="p-4">
               <textarea
                 className="w-full h-40 text-lg text-textColor bg-transparent resize-none border-none outline-none"
-                placeholder="Digite seu texto..."                
+                placeholder="Digite seu texto..." value={textoVazio} onChange={(e) => novoTexto(e.target.value)}
               ></textarea>
             </div>
 
@@ -97,7 +105,7 @@ function App() {
                   <div className="animate-spin rounded-full h-8 w-8 border-blue-500 border-t-2"></div>
                 </div>
               ) : (
-                <p className="text-lg text-textColor">Colocar aqui o texto traduzido</p>
+                <p className="text-lg text-textColor">{traduzir}</p>
               )}
             </div>
           </div>
