@@ -3,31 +3,46 @@ import { useEffect, useState } from "react";
 function App() {
   const [linguaAtual, novaLingua] = useState("pt-br");
   const [linguaTraduzida, novaLinguaTraduzida] = useState("en-us");
-  const [textoVazio, novoTexto] = useState("");
+  const [textoAtual, novoTexto] = useState("");
   const [traduzir, traduzido] = useState("");
   const [isLoading, isLoading1] = useState("");
+  const [isErro, isErro1 ] = useState("");
+  
 
-  let error = "";
 
   useEffect(() => {
-    if (textoVazio) {
+    if (textoAtual) {
       traducao();
     }
-  }, [textoVazio]);
+  }, [textoAtual]);
 
   const traducao = async () => {
     isLoading1(true);
-    const response = await fetch(
-      `https://api.mymemory.translated.net/get?q=${textoVazio}!&langpair=${linguaAtual}|${linguaTraduzida}`
-    );
+    isErro1("")
 
-    if (!response.ok) {
-      alert("Erro ao traduzir");
+    try {
+      const response = await fetch(
+        `https://api.mymemory.translated.net/get?q=${textoAtual}!&langpair=${linguaAtual}|${linguaTraduzida}`
+      );
+  
+      const data = await response.json();
+      traduzido(data.responseData.translatedText);
+      isLoading1(false);
+
+
+    } catch (e) {
+      isErro1("Erro ao traduzir: " + e.message)
     }
-    const data = await response.json();
-    traduzido(data.responseData.translatedText);
-    isLoading1(false);
-  };
+  }; 
+
+
+  function inverteLinguas() {
+    novaLingua(linguaTraduzida)
+    novaLinguaTraduzida(linguaAtual)
+    novoTexto(traduzir)
+    traduzido(textoAtual)
+    
+  }
 
   const languages = [
     { code: "en-us", name: "Inglês" },
@@ -61,7 +76,7 @@ function App() {
               ))}
             </select>
 
-            <button className="p-2 rounded-full hover:bg-gray-100 outline-none">
+            <button className="p-2 rounded-full hover:bg-gray-100 outline-none" onClick={inverteLinguas}>
               <svg
                 className="w-5 h-5 text-headerColor"
                 fill="none"
@@ -95,7 +110,7 @@ function App() {
             <div className="p-4">
               <textarea
                 className="w-full h-40 text-lg text-textColor bg-transparent resize-none border-none outline-none"
-                placeholder="Digite seu texto..." value={textoVazio} onChange={(e) => novoTexto(e.target.value)}
+                placeholder="Digite seu texto..." value={textoAtual} onChange={(e) => novoTexto(e.target.value)}
               ></textarea>
             </div>
 
@@ -110,9 +125,9 @@ function App() {
             </div>
           </div>
 
-          {error && (
+          {isErro && (
             <div className="p-4 bg-red-100 border-t border-red-400 text-red-700">
-              {error}
+              {isErro}
             </div>
           )}
         </div>
